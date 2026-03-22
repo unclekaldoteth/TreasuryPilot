@@ -1,6 +1,17 @@
 import { db } from "@/lib/db/client";
 import type { TreasuryPolicy } from "@/lib/types";
 
+export const DEFAULT_TREASURY_POLICY: TreasuryPolicy = {
+  perTxLimit: 2500,
+  dailyLimit: 5000,
+  weeklyLimit: 15000,
+  autoApprovalLimit: 500,
+  allowedAssets: ["USDt"],
+  allowedCategories: ["contractor", "software", "operations", "revenue-share"],
+  requireAllowlist: true,
+  paused: false,
+};
+
 function parseStringArray(value: string) {
   try {
     const parsed = JSON.parse(value) as unknown;
@@ -23,7 +34,7 @@ export async function getLatestTreasuryPolicy(): Promise<TreasuryPolicy> {
   });
 
   if (!policy) {
-    throw new Error("Treasury policy is missing. Run the Prisma seed before accepting payment requests.");
+    return DEFAULT_TREASURY_POLICY;
   }
 
   return {

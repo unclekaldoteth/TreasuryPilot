@@ -1,6 +1,8 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { SectionCard } from "@/components/layout/section-card";
+import { SetupNotice } from "@/components/layout/setup-notice";
 import { StatusPill } from "@/components/ui/status-pill";
+import { getMissingEnvKeys } from "@/lib/config/env";
 import { listStoredPaymentRequests } from "@/lib/db/repositories/payment-requests";
 import { getLatestTreasuryPolicy } from "@/lib/db/repositories/treasury-policy";
 import { getWalletBalance } from "@/lib/wallet/get-balance";
@@ -23,11 +25,38 @@ function formatWalletMetric(input: { balance: string; asset: string; status: str
 export default async function DashboardPage() {
   await refreshPendingTransactionStatuses().catch(() => null);
 
-  const [wallet, treasuryPolicy, paymentRequests] = await Promise.all([
-    getWalletBalance(),
-    getLatestTreasuryPolicy(),
-    listStoredPaymentRequests(),
-  ]);
+  let wallet;
+  let treasuryPolicy;
+  let paymentRequests;
+
+  try {
+    [wallet, treasuryPolicy, paymentRequests] = await Promise.all([
+      getWalletBalance(),
+      getLatestTreasuryPolicy(),
+      listStoredPaymentRequests(),
+    ]);
+  } catch (error) {
+    const missingEnvKeys = getMissingEnvKeys();
+    const details =
+      missingEnvKeys.length > 0
+        ? `Missing environment variables: ${missingEnvKeys.join(", ")}.`
+        : error instanceof Error
+          ? error.message
+          : "The deployment could not reach the Postgres database.";
+
+    return (
+      <AppShell
+        title="Treasury Dashboard"
+        description="Live treasury posture from the persisted wallet, current policy, and recent payment decisions."
+      >
+        <SetupNotice
+          title="Dashboard unavailable"
+          summary="This page needs a working Postgres connection before it can render live treasury data."
+          details={details}
+        />
+      </AppShell>
+    );
+  }
 
   const recentDecisions = paymentRequests.slice(0, 6);
 

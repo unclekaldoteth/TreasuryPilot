@@ -6,7 +6,22 @@ import type { WalletBalanceSnapshot } from "@/lib/wallet/types";
 
 export async function getWalletBalance(): Promise<WalletBalanceSnapshot> {
   const env = getEnv();
-  const walletConfig = await getLatestWalletConfig();
+  let walletConfig: Awaited<ReturnType<typeof getLatestWalletConfig>> = null;
+
+  try {
+    walletConfig = await getLatestWalletConfig();
+  } catch (error) {
+    return {
+      network: env.wdkNetwork,
+      address: "",
+      asset: env.wdkAssetSymbol,
+      balance: "unavailable",
+      status: "error",
+      walletType: "erc-4337",
+      tokenAddress: env.wdkPaymasterTokenAddress,
+      error: error instanceof Error ? error.message : "Unable to reach the wallet configuration store.",
+    };
+  }
 
   if (!walletConfig) {
     return {

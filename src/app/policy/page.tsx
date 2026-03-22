@@ -1,16 +1,44 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { SectionCard } from "@/components/layout/section-card";
+import { SetupNotice } from "@/components/layout/setup-notice";
 import { StatusPill } from "@/components/ui/status-pill";
+import { getMissingEnvKeys } from "@/lib/config/env";
 import { getLatestTreasuryPolicy } from "@/lib/db/repositories/treasury-policy";
 import { listStoredVendors } from "@/lib/db/repositories/vendors";
 
 export const dynamic = "force-dynamic";
 
 export default async function PolicyPage() {
-  const [treasuryPolicy, vendors] = await Promise.all([
-    getLatestTreasuryPolicy(),
-    listStoredVendors(),
-  ]);
+  let treasuryPolicy;
+  let vendors;
+
+  try {
+    [treasuryPolicy, vendors] = await Promise.all([
+      getLatestTreasuryPolicy(),
+      listStoredVendors(),
+    ]);
+  } catch (error) {
+    const missingEnvKeys = getMissingEnvKeys();
+    const details =
+      missingEnvKeys.length > 0
+        ? `Missing environment variables: ${missingEnvKeys.join(", ")}.`
+        : error instanceof Error
+          ? error.message
+          : "The deployment could not load policy data from Postgres.";
+
+    return (
+      <AppShell
+        title="Policy Control Surface"
+        description="This page mirrors the deterministic constraints sitting between the agent and wallet execution."
+      >
+        <SetupNotice
+          title="Policy data unavailable"
+          summary="This page needs a working Postgres connection before it can load treasury policy and vendors."
+          details={details}
+        />
+      </AppShell>
+    );
+  }
 
   return (
     <AppShell
