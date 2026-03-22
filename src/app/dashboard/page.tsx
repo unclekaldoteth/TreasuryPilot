@@ -1,6 +1,7 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { SectionCard } from "@/components/layout/section-card";
 import { SetupNotice } from "@/components/layout/setup-notice";
+import { WalletPosturePanel } from "@/components/dashboard/wallet-posture-panel";
 import { StatusPill } from "@/components/ui/status-pill";
 import { getMissingEnvKeys } from "@/lib/config/env";
 import { listStoredPaymentRequests } from "@/lib/db/repositories/payment-requests";
@@ -124,33 +125,7 @@ export default async function DashboardPage() {
 
       <section className="grid gap-4 lg:grid-cols-[1.15fr_0.85fr]">
         <SectionCard title="Wallet posture" eyebrow="Runtime snapshot">
-          <dl className="grid gap-3 text-sm text-[var(--muted)]">
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-              <dt>Network</dt>
-              <dd className="font-medium text-[var(--ink)]">{wallet.network}</dd>
-            </div>
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-              <dt>Address</dt>
-              <dd className="max-w-[22rem] truncate text-right font-medium text-[var(--ink)]">
-                {wallet.address || "Wallet not initialized"}
-              </dd>
-            </div>
-            <div className="flex items-center justify-between border-b border-[var(--border)] pb-3">
-              <dt>Token balance</dt>
-              <dd className="font-medium text-[var(--ink)]">
-                {wallet.status === "error" ? "Unavailable" : `${wallet.balance} ${wallet.asset}`}
-              </dd>
-            </div>
-            <div className="flex items-center justify-between">
-              <dt>Status</dt>
-              <dd>
-                <StatusPill label={wallet.status} />
-              </dd>
-            </div>
-          </dl>
-          {wallet.error ? (
-            <p className="mt-4 text-sm leading-6 text-[var(--rose)]">{wallet.error}</p>
-          ) : null}
+          <WalletPosturePanel wallet={wallet} />
         </SectionCard>
 
         <SectionCard title="Policy stance" eyebrow="Hard controls">
