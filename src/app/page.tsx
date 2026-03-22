@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ArchitectureFlow } from "@/components/landing/architecture-flow";
 
 export default function Home() {
@@ -45,18 +46,19 @@ export default function Home() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <a
-                  className="rounded-full bg-[var(--navy)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#10273c]"
+                <Link
+                  className="inline-flex min-w-[17rem] items-center justify-center gap-2 rounded-full bg-[var(--navy)] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_40px_-24px_rgba(21,50,76,0.7)] transition hover:-translate-y-0.5 hover:bg-[#10273c] hover:shadow-[0_24px_50px_-28px_rgba(16,39,60,0.75)]"
                   href="/dashboard"
                 >
-                  Open Dashboard
-                </a>
-                <a
-                  className="rounded-full border border-[var(--border)] bg-white/70 px-5 py-3 text-sm font-semibold text-[var(--ink)] transition hover:bg-white"
+                  <span>Open Dashboard</span>
+                  <span aria-hidden="true">→</span>
+                </Link>
+                <Link
+                  className="inline-flex min-w-[21rem] items-center justify-center rounded-full border border-[var(--border)] bg-white/72 px-6 py-3.5 text-sm font-semibold text-[var(--ink)] shadow-[0_14px_34px_-28px_var(--shadow)] transition hover:-translate-y-0.5 hover:bg-white"
                   href="/payments"
                 >
                   Review Payment Flow
-                </a>
+                </Link>
               </div>
             </div>
             <div className="grid gap-4">

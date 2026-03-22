@@ -22,15 +22,27 @@ function formatTimestamp(value: string) {
 
 export default async function AuditPage() {
   await refreshPendingTransactionStatuses().catch(() => null);
+  let auditEvents = null;
+  let details: string | null = null;
 
   try {
-    const auditEvents = await listAuditEvents();
+    auditEvents = await listAuditEvents();
+  } catch (error) {
+    const missingEnvKeys = getMissingEnvKeys();
+    details =
+      missingEnvKeys.length > 0
+        ? `Missing environment variables: ${missingEnvKeys.join(", ")}.`
+        : error instanceof Error
+          ? error.message
+          : "The deployment could not read audit events from Postgres.";
+  }
 
-    return (
-      <AppShell
-        title="Audit Trail"
-        description="Every critical transition is persisted here. Pending transfers are refreshed on page load so the event stream reflects the latest known onchain state."
-      >
+  return (
+    <AppShell
+      title="Audit Trail"
+      description="Every critical transition is persisted here. Pending transfers are refreshed on page load so the event stream reflects the latest known onchain state."
+    >
+      {auditEvents ? (
         <SectionCard title="Event stream" eyebrow="Immutable app log">
           {auditEvents.length === 0 ? (
             <p className="text-sm leading-6 text-[var(--muted)]">
@@ -58,28 +70,13 @@ export default async function AuditPage() {
             </div>
           )}
         </SectionCard>
-      </AppShell>
-    );
-  } catch (error) {
-    const missingEnvKeys = getMissingEnvKeys();
-    const details =
-      missingEnvKeys.length > 0
-        ? `Missing environment variables: ${missingEnvKeys.join(", ")}.`
-        : error instanceof Error
-          ? error.message
-          : "The deployment could not read audit events from Postgres.";
-
-    return (
-      <AppShell
-        title="Audit Trail"
-        description="Every critical transition is persisted here."
-      >
+      ) : (
         <SetupNotice
           title="Audit data unavailable"
           summary="This page needs a working Postgres connection before it can load the audit trail."
-          details={details}
+          details={details ?? "The deployment could not read audit events from Postgres."}
         />
-      </AppShell>
-    );
-  }
+      )}
+    </AppShell>
+  );
 }

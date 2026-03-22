@@ -7,37 +7,35 @@ import { listApprovals } from "@/lib/approvals/service";
 export const dynamic = "force-dynamic";
 
 export default async function ApprovalsPage() {
-  try {
-    const approvals = await listApprovals();
+  let approvals = null;
+  let details: string | null = null;
 
-    return (
-      <AppShell
-        title="Approval Queue"
-        description="Escalated requests land here for a single human sign-off step. Approvals and rejections are written back to the live treasury state."
-      >
-        <ApprovalQueue initialApprovals={approvals} />
-      </AppShell>
-    );
+  try {
+    approvals = await listApprovals();
   } catch (error) {
     const missingEnvKeys = getMissingEnvKeys();
-    const details =
+    details =
       missingEnvKeys.length > 0
         ? `Missing environment variables: ${missingEnvKeys.join(", ")}.`
         : error instanceof Error
           ? error.message
           : "The deployment could not read approvals from Postgres.";
+  }
 
-    return (
-      <AppShell
-        title="Approval Queue"
-        description="Escalated requests land here for a single human sign-off step."
-      >
+  return (
+    <AppShell
+      title="Approval Queue"
+      description="Escalated requests land here for a single human sign-off step. Approvals and rejections are written back to the live treasury state."
+    >
+      {approvals ? (
+        <ApprovalQueue initialApprovals={approvals} />
+      ) : (
         <SetupNotice
           title="Approvals unavailable"
           summary="This page needs a working Postgres connection before it can load escalated requests."
-          details={details}
+          details={details ?? "The deployment could not read approvals from Postgres."}
         />
-      </AppShell>
-    );
-  }
+      )}
+    </AppShell>
+  );
 }
