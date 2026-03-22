@@ -168,6 +168,41 @@ npm run db:migrate
 
 For the recorded walkthrough flow, see [DEMO_SCRIPT.md](./DEMO_SCRIPT.md).
 
+## Submission Disclosures
+
+### License
+
+This repository is licensed under `Apache-2.0`. See [LICENSE](./LICENSE).
+
+### Third-party services and pre-built components
+
+TreasuryPilot depends on official Tether WDK SDKs and standard open-source application tooling:
+
+- `@tetherto/wdk`
+- `@tetherto/wdk-wallet`
+- `@tetherto/wdk-wallet-evm-erc-4337`
+- `@tetherto/wdk-protocol-bridge-usdt0-evm`
+- `Next.js`
+- `React`
+- `TypeScript`
+- `Prisma`
+- `Tailwind CSS`
+- `Vitest`
+
+Depending on environment configuration, the app may also use external PostgreSQL, RPC, bundler, and paymaster infrastructure for demo or deployment.
+
+### Pre-existing code disclosure
+
+TreasuryPilot is a custom hackathon application built on top of official Tether SDKs and standard open-source frameworks. The product-specific treasury logic, policy engine wiring, wallet flow, approvals, audit trail, and bridge request flow in this repository were assembled for this project rather than copied from a closed-source internal product.
+
+If your team reused additional code outside this public repository history, disclose that explicitly in the DoraHacks submission.
+
+### Agent framework note
+
+TreasuryPilot uses an in-app agent runtime that serves as an equivalent agent framework for this project. It handles request interpretation, normalization, and decision preparation, while deterministic policy enforcement remains the final authority before any wallet action. The architecture is compatible with OpenClaw or another orchestration layer, but wallet authority stays inside the same policy and execution boundary.
+
+For reusable submission wording, see [SUBMISSION_NOTES.md](./SUBMISSION_NOTES.md).
+
 ## Important Notes
 
 - TreasuryPilot is intentionally conservative: the policy engine is the final gate before any wallet action.
