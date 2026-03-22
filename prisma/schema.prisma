@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model WalletConfig {
+  id            String   @id @default(cuid())
+  network       String
+  walletType    String
+  publicAddress String
+  encryptedSeed String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Vendor {
+  id            String   @id @default(cuid())
+  name          String
+  walletAddress String   @unique
+  asset         String
+  category      String
+  isAllowlisted Boolean  @default(true)
+  isBlocked     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+}
+
+model TreasuryPolicy {
+  id                String   @id @default(cuid())
+  name              String
+  perTxLimit        Float
+  dailyLimit        Float
+  weeklyLimit       Float
+  autoApprovalLimit Float
+  allowedAssets     String
+  allowedCategories String
+  requireAllowlist  Boolean  @default(true)
+  paused            Boolean  @default(false)
+  updatedAt         DateTime @updatedAt
+}
+
+model PaymentRequest {
+  id            String             @id @default(cuid())
+  rawRequest    String
+  requester     String?
+  requestSource String             @default("human")
+  sourceAgentId String?
+  status        String
+  createdAt     DateTime           @default(now())
+  sourceAgent   AgentClient?       @relation(fields: [sourceAgentId], references: [id], onDelete: SetNull)
+  paymentIntent PaymentIntent?
+  evaluation    PolicyEvaluation?
+  bridgeRequest BridgeRequest?
+  approvals     Approval[]
+  transactions  Transaction[]
+  auditEvents   AuditEvent[]
+}
+
+model AgentClient {
+  id            String           @id @default(cuid())
+  name          String
+  authTokenHash String           @unique
+  callbackUrl   String?
+  status        String
+  createdAt     DateTime         @default(now())
+  requests      PaymentRequest[]
+}
+
+model BridgeRequest {
+  id                 String         @id @default(cuid())
+  paymentRequestId   String         @unique
+  sourceNetwork      String
+  destinationNetwork String
+  recipientAddress   String
+  asset              String
+  amount             Float
+  purpose            String
+  bridgeStatus       String
+  createdAt          DateTime       @default(now())
+  paymentRequest     PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+}
+
+model PaymentIntent {
+  id               String         @id @default(cuid())
+  paymentRequestId String         @unique
+  recipientAddress String
+  vendorName       String
+  asset            String
+  amount           Float
+  category         String
+  reasonSummary    String
+  llmConfidence    Float
+  createdAt        DateTime       @default(now())
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+}
+
+model PolicyEvaluation {
+  id               String         @id @default(cuid())
+  paymentRequestId String         @unique
+  decision         String
+  decisionReason   String
+  ruleResultsJson  String
+  createdAt        DateTime       @default(now())
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+}
+
+model Approval {
+  id               String         @id @default(cuid())
+  paymentRequestId String
+  status           String
+  reviewerLabel    String?
+  reviewNotes      String?
+  createdAt        DateTime       @default(now())
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+}
+
+model Transaction {
+  id               String         @id @default(cuid())
+  paymentRequestId String
+  network          String
+  asset            String
+  amount           Float
+  txHash           String?
+  txStatus         String
+  submittedAt      DateTime?
+  confirmedAt      DateTime?
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+}
+
+model AuditEvent {
+  id               String         @id @default(cuid())
+  paymentRequestId String
+  eventType        String
+  payloadJson      String
+  createdAt        DateTime       @default(now())
+  paymentRequest   PaymentRequest @relation(fields: [paymentRequestId], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,104 @@
+@import "tailwindcss";
+
+:root {
+  --background: #f3efe4;
+  --paper: #fffaf0;
+  --panel: rgba(255, 250, 240, 0.75);
+  --panel-strong: rgba(255, 250, 240, 0.92);
+  --ink: #15231f;
+  --muted: #57665f;
+  --border: rgba(21, 35, 31, 0.14);
+  --shadow: rgba(16, 20, 18, 0.12);
+  --mint: #1f8f62;
+  --gold: #b78512;
+  --rose: #b64a4a;
+  --navy: #15324c;
+}
+
+[data-theme="dark"] {
+  --background: #0e1419;
+  --paper: #161d24;
+  --panel: rgba(22, 29, 36, 0.8);
+  --panel-strong: rgba(22, 29, 36, 0.94);
+  --ink: #e8ede9;
+  --muted: #8a9a92;
+  --border: rgba(232, 237, 233, 0.12);
+  --shadow: rgba(0, 0, 0, 0.35);
+  --mint: #34d889;
+  --gold: #daa520;
+  --rose: #e06060;
+  --navy: #1c4a72;
+}
+
+[data-theme="dark"] html,
+html[data-theme="dark"] {
+  background:
+    radial-gradient(circle at top left, rgba(31, 143, 98, 0.1), transparent 24rem),
+    radial-gradient(circle at bottom right, rgba(183, 133, 18, 0.08), transparent 22rem),
+    linear-gradient(180deg, #0e1419 0%, #111920 48%, #131b22 100%);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--ink);
+  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
+  --font-mono: "SFMono-Regular", "Menlo", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background:
+    radial-gradient(circle at top left, rgba(31, 143, 98, 0.14), transparent 24rem),
+    radial-gradient(circle at bottom right, rgba(183, 133, 18, 0.14), transparent 22rem),
+    linear-gradient(180deg, #f7f1e2 0%, #f2ecde 48%, #efe7d8 100%);
+  color: var(--ink);
+}
+
+body {
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+::selection {
+  background: rgba(31, 143, 98, 0.18);
+}
+
+.hero-shimmer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    transparent 30%,
+    rgba(31, 143, 98, 0.06) 42%,
+    rgba(183, 133, 18, 0.05) 52%,
+    transparent 64%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  animation: hero-shimmer 6s ease-in-out infinite;
+  pointer-events: none;
+  border-radius: inherit;
+  z-index: 0;
+}
+
+.hero-shimmer > * {
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes hero-shimmer {
+  0% { background-position: 200% 0; }
+  50% { background-position: -50% 0; }
+  100% { background-position: 200% 0; }
+}
