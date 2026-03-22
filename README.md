@@ -201,8 +201,6 @@ If your team reused additional code outside this public repository history, disc
 
 TreasuryPilot uses an in-app agent runtime that serves as an equivalent agent framework for this project. It handles request interpretation, normalization, and decision preparation, while deterministic policy enforcement remains the final authority before any wallet action. The architecture is compatible with OpenClaw or another orchestration layer, but wallet authority stays inside the same policy and execution boundary.
 
-For reusable submission wording, see [SUBMISSION_NOTES.md](./SUBMISSION_NOTES.md).
-
 ## Important Notes
 
 - TreasuryPilot is intentionally conservative: the policy engine is the final gate before any wallet action.
