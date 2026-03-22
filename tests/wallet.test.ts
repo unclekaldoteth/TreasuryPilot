@@ -3,10 +3,12 @@ import { getLatestWalletConfig } from "@/lib/db/repositories/wallet-config";
 import { createWallet } from "@/lib/wallet/create-wallet";
 import { getWalletBalance } from "@/lib/wallet/get-balance";
 import { resetTestDatabase } from "./helpers/database";
+import { hasConfiguredTestDatabase } from "./helpers/test-database";
 
 const DEMO_SEED_PHRASE = "test test test test test test test test test test test junk";
+const describeDatabase = hasConfiguredTestDatabase ? describe : describe.skip;
 
-describe("wallet integration", () => {
+describeDatabase("wallet integration", () => {
   beforeEach(async () => {
     process.env.APP_ENCRYPTION_KEY = "test-encryption-key";
     await resetTestDatabase();

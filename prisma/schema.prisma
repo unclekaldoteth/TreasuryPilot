@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -43,14 +43,14 @@ model TreasuryPolicy {
 }
 
 model PaymentRequest {
-  id            String             @id @default(cuid())
+  id            String            @id @default(cuid())
   rawRequest    String
   requester     String?
-  requestSource String             @default("human")
+  requestSource String            @default("human")
   sourceAgentId String?
   status        String
-  createdAt     DateTime           @default(now())
-  sourceAgent   AgentClient?       @relation(fields: [sourceAgentId], references: [id], onDelete: SetNull)
+  createdAt     DateTime          @default(now())
+  sourceAgent   AgentClient?      @relation(fields: [sourceAgentId], references: [id], onDelete: SetNull)
   paymentIntent PaymentIntent?
   evaluation    PolicyEvaluation?
   bridgeRequest BridgeRequest?

@@ -1,7 +1,10 @@
 import { createHash } from "node:crypto";
 import { db } from "@/lib/db/client";
+import { assertSafeTestDatabaseUrl } from "./test-database";
 
 export async function resetTestDatabase() {
+  assertSafeTestDatabaseUrl();
+
   await db.auditEvent.deleteMany();
   await db.transaction.deleteMany();
   await db.approval.deleteMany();
@@ -16,6 +19,8 @@ export async function resetTestDatabase() {
 }
 
 export async function seedTreasuryFixtures() {
+  assertSafeTestDatabaseUrl();
+
   await db.treasuryPolicy.create({
     data: {
       name: "Default Treasury Policy",

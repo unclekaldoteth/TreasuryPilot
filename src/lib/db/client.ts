@@ -1,20 +1,23 @@
 import { PrismaClient } from "@prisma/client";
-import { resolveDatabaseUrl } from "@/lib/db/resolve-database-url";
 
 const globalForPrisma = globalThis as {
   prisma?: PrismaClient;
   prismaDatabaseUrl?: string;
 };
-const databaseUrl = resolveDatabaseUrl(process.env.DATABASE_URL ?? "file:./prisma/dev.db");
+const databaseUrl = process.env.DATABASE_URL?.trim() ?? "";
 
 function createPrismaClient() {
   return new PrismaClient({
     log: process.env.NODE_ENV === "development" ? ["warn", "error"] : ["error"],
-    datasources: {
-      db: {
-        url: databaseUrl,
-      },
-    },
+    ...(databaseUrl
+      ? {
+          datasources: {
+            db: {
+              url: databaseUrl,
+            },
+          },
+        }
+      : {}),
   });
 }
 

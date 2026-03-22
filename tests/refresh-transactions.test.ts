@@ -6,6 +6,7 @@ import {
 } from "@/lib/db/repositories/payment-requests";
 import { refreshPendingTransactionStatuses } from "@/lib/wallet/refresh-transactions";
 import { resetTestDatabase, seedTreasuryFixtures } from "./helpers/database";
+import { hasConfiguredTestDatabase } from "./helpers/test-database";
 
 vi.mock("@/lib/wallet/client", () => ({
   loadStoredWallet: vi.fn(),
@@ -14,8 +15,9 @@ vi.mock("@/lib/wallet/client", () => ({
 import { loadStoredWallet } from "@/lib/wallet/client";
 
 const mockedLoadStoredWallet = vi.mocked(loadStoredWallet);
+const describeDatabase = hasConfiguredTestDatabase ? describe : describe.skip;
 
-describe("refreshPendingTransactionStatuses", () => {
+describeDatabase("refreshPendingTransactionStatuses", () => {
   beforeEach(async () => {
     vi.resetAllMocks();
     await resetTestDatabase();

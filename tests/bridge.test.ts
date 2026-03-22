@@ -9,6 +9,10 @@ vi.mock("@/lib/wallet/client", () => ({
   loadStoredWallet: vi.fn(),
 }));
 
+vi.mock("@/lib/db/repositories/treasury-policy", () => ({
+  getLatestTreasuryPolicy: vi.fn(),
+}));
+
 vi.mock("@tetherto/wdk-protocol-bridge-usdt0-evm", () => ({
   default: vi.fn(
     class MockUsdt0ProtocolEvm {
@@ -19,6 +23,7 @@ vi.mock("@tetherto/wdk-protocol-bridge-usdt0-evm", () => ({
 }));
 
 import { loadStoredWallet } from "@/lib/wallet/client";
+import { getLatestTreasuryPolicy } from "@/lib/db/repositories/treasury-policy";
 import {
   executeBridgeIntent,
   getBridgeFeatureStatus,
@@ -26,6 +31,7 @@ import {
 } from "@/lib/bridge/service";
 
 const mockedLoadStoredWallet = vi.mocked(loadStoredWallet);
+const mockedGetLatestTreasuryPolicy = vi.mocked(getLatestTreasuryPolicy);
 
 function createWalletFixture() {
   const dispose = vi.fn();
@@ -77,6 +83,17 @@ describe("bridge service", () => {
     process.env.WDK_BRIDGE_ASSET_DECIMALS = "6";
     process.env.WDK_BRIDGE_MAX_FEE = "1000000000000000";
     process.env.WDK_PAYMASTER_TOKEN_ADDRESS = "0xd077a400968890eacc75cdc901f0356c943e4fdb";
+
+    mockedGetLatestTreasuryPolicy.mockResolvedValue({
+      perTxLimit: 2500,
+      dailyLimit: 5000,
+      weeklyLimit: 15000,
+      autoApprovalLimit: 500,
+      allowedAssets: ["USDt"],
+      allowedCategories: ["contractor", "software", "operations", "revenue-share"],
+      requireAllowlist: true,
+      paused: false,
+    });
 
     protocolSpies.quoteBridge.mockResolvedValue({
       fee: 1n,

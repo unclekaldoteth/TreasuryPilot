@@ -8,8 +8,11 @@ import {
 } from "@/lib/db/repositories/bridge-requests";
 import { createStoredPaymentRequest } from "@/lib/db/repositories/payment-requests";
 import { resetTestDatabase, seedTreasuryFixtures } from "./helpers/database";
+import { hasConfiguredTestDatabase } from "./helpers/test-database";
 
-describe("persistence flows", () => {
+const describeDatabase = hasConfiguredTestDatabase ? describe : describe.skip;
+
+describeDatabase("persistence flows", () => {
   beforeEach(async () => {
     process.env.FEATURE_AGENT_GATEWAY = "true";
     await resetTestDatabase();

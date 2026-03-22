@@ -1,5 +1,3 @@
-import { resolveDatabaseUrl } from "@/lib/db/resolve-database-url";
-
 const requiredKeys = ["DATABASE_URL", "APP_ENCRYPTION_KEY"] as const;
 
 function parseBooleanFlag(value: string | undefined) {
@@ -34,7 +32,7 @@ function parseCsv(value: string | undefined, fallback: string[]) {
 
 export function getEnv() {
   return {
-    databaseUrl: resolveDatabaseUrl(process.env.DATABASE_URL ?? "file:./prisma/dev.db"),
+    databaseUrl: process.env.DATABASE_URL ?? "",
     appEncryptionKey: process.env.APP_ENCRYPTION_KEY ?? "replace-with-32-byte-key",
     openAiApiKey: process.env.OPENAI_API_KEY ?? "",
     wdkNetwork: process.env.WDK_NETWORK ?? "ethereum-sepolia",

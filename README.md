@@ -79,7 +79,7 @@ cp .env.example .env.local
 Minimal local demo values:
 
 ```env
-DATABASE_URL="file:./prisma/test.db"
+DATABASE_URL="postgresql://postgres:postgres@127.0.0.1:5432/treasurypilot?schema=public"
 APP_ENCRYPTION_KEY="local-demo-encryption-key"
 FEATURE_BRIDGE_ROUTING="true"
 WDK_BRIDGE_ALLOWED_DESTINATIONS="optimism,polygon,ethereum,solana"
@@ -142,38 +142,34 @@ npm test
 npm run build
 ```
 
-The test suite covers persistence, wallet creation, transfer execution behavior, receipt refresh, bridge parsing, bridge execution behavior, and SQLite path resolution.
+`npm test` always runs the pure unit tests. The Postgres-backed integration suites also run when `TEST_DATABASE_URL` is configured in `.env.test.local` and the test database has been migrated.
+
+## Vercel Deployment
+
+1. Connect the repo to Vercel.
+2. Provision a managed Postgres database and set `DATABASE_URL` in Vercel.
+3. Set `APP_ENCRYPTION_KEY` and the required WDK environment variables.
+4. Apply migrations before or during deployment with:
+
+```bash
+npm run db:migrate
+```
 
 ## Tech Stack
 
 - `Next.js 16`
 - `React 19`
 - `TypeScript`
-- `Prisma + SQLite`
+- `Prisma + Postgres`
 - `Tether WDK`
 - `Vitest`
 
 ## Demo Guide
 
 For the recorded walkthrough flow, see [DEMO_SCRIPT.md](./DEMO_SCRIPT.md).
-```
-
-### Bridge to Solana
-
-```text
-Bridge 250 USDt0 from Arbitrum to Solana recipient HyXJcgYpURfDhgzuyRL7zxP4FhLg7LZQMeDrR4MXZcMN for settlement liquidity
-```
 
 ## Important Notes
 
 - TreasuryPilot is intentionally conservative: the policy engine is the final gate before any wallet action.
-- The app resolves relative SQLite paths to absolute paths at runtime so Prisma works reliably in Next dev and build contexts.
+- For Vercel, deploy the app on Vercel and use a managed Postgres database exposed through `DATABASE_URL`.
 - Bridge support in this repo is built to be honest for demos. A supported route in the UI does not imply live execution is enabled.
-
-## Supporting Docs
-
-- [PRD.md](./PRD.md)
-- [TECHNICAL_ARCHITECTURE.md](./TECHNICAL_ARCHITECTURE.md)
-- [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md)
-- [DORAHACKS_SUBMISSION_COPY.md](./DORAHACKS_SUBMISSION_COPY.md)
-- [DEMO_SCRIPT.md](./DEMO_SCRIPT.md)

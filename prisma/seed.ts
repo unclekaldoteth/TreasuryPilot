@@ -1,27 +1,28 @@
 import { PrismaClient } from "@prisma/client";
 import { createHash } from "node:crypto";
-import path from "node:path";
 
-function resolveSqliteUrl(databaseUrl: string): string {
-  if (!databaseUrl.startsWith("file:")) return databaseUrl;
-  const filePath = databaseUrl.slice("file:".length);
-  if (path.isAbsolute(filePath)) return databaseUrl;
-  return `file:${path.resolve(process.cwd(), filePath)}`;
-}
-
-const prisma = new PrismaClient({
-  datasources: {
-    db: {
-      url: resolveSqliteUrl(process.env.DATABASE_URL ?? "file:./prisma/dev.db"),
-    },
-  },
-});
+const databaseUrl = process.env.DATABASE_URL?.trim() ?? "";
+const prisma = new PrismaClient(
+  databaseUrl
+    ? {
+        datasources: {
+          db: {
+            url: databaseUrl,
+          },
+        },
+      }
+    : undefined,
+);
 
 function hashToken(value: string) {
   return createHash("sha256").update(value).digest("hex");
 }
 
 async function main() {
+  if (!databaseUrl) {
+    throw new Error("DATABASE_URL is required to seed the Postgres database.");
+  }
+
   await prisma.auditEvent.deleteMany();
   await prisma.transaction.deleteMany();
   await prisma.approval.deleteMany();
