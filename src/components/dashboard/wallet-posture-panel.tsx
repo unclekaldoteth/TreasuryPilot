@@ -69,7 +69,7 @@ export function WalletPosturePanel({ wallet }: WalletPosturePanelProps) {
         </div>
       </dl>
 
-      {wallet.status !== "connected" ? (
+      {wallet.status === "missing" ? (
         <div className="mt-4 space-y-3">
           <p className="text-sm leading-6 text-[var(--muted)]">
             Initialize the treasury wallet to generate and persist the ERC-4337 account used by the demo.
@@ -83,6 +83,13 @@ export function WalletPosturePanel({ wallet }: WalletPosturePanelProps) {
             {isInitializing ? "Initializing..." : "Initialize wallet"}
           </button>
         </div>
+      ) : null}
+
+      {wallet.status === "error" ? (
+        <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+          Wallet configuration already exists, but the runtime could not load it cleanly. Resolve the current error
+          before attempting any reinitialization.
+        </p>
       ) : null}
 
       {actionError ? <p className="mt-4 text-sm leading-6 text-[var(--rose)]">{actionError}</p> : null}

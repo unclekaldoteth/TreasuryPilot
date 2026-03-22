@@ -4,6 +4,7 @@ import { SetupNotice } from "@/components/layout/setup-notice";
 import { WalletPosturePanel } from "@/components/dashboard/wallet-posture-panel";
 import { StatusPill } from "@/components/ui/status-pill";
 import { getMissingEnvKeys } from "@/lib/config/env";
+import { calculateDashboardMetrics } from "@/lib/dashboard/metrics";
 import { listStoredPaymentRequests } from "@/lib/db/repositories/payment-requests";
 import { getLatestTreasuryPolicy } from "@/lib/db/repositories/treasury-policy";
 import { getWalletBalance } from "@/lib/wallet/get-balance";
@@ -60,18 +61,13 @@ export default async function DashboardPage() {
   }
 
   const recentDecisions = paymentRequests.slice(0, 6);
-
-  const totalProcessed = paymentRequests.length;
-  const executedCount = paymentRequests.filter((r) => r.decision === "execute").length;
-  const rejectedCount = paymentRequests.filter((r) => r.decision === "reject").length;
-  const escalatedCount = paymentRequests.filter((r) => r.decision === "escalate").length;
-  const executionRate = totalProcessed > 0 ? Math.round((executedCount / totalProcessed) * 100) : 0;
-  const totalMoved = paymentRequests
-    .filter((r) => r.decision === "execute")
-    .reduce((sum, r) => {
-      const num = parseFloat(r.amount.replace(/[^0-9.]/g, ""));
-      return sum + (isNaN(num) ? 0 : num);
-    }, 0);
+  const {
+    totalProcessed,
+    rejectedCount,
+    escalatedCount,
+    executionRate,
+    totalMoved,
+  } = calculateDashboardMetrics(paymentRequests);
 
   const metrics = [
     {

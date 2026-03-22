@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { getLatestWalletConfig } from "@/lib/db/repositories/wallet-config";
+import { POST as createWalletRoute } from "@/app/api/wallet/route";
 import { createWallet } from "@/lib/wallet/create-wallet";
 import { getWalletBalance } from "@/lib/wallet/get-balance";
 import { resetTestDatabase } from "./helpers/database";
@@ -33,5 +34,27 @@ describeDatabase("wallet integration", () => {
 
     expect(balance.status).toBe("missing");
     expect(balance.error).toMatch(/not been initialized/i);
+  });
+
+  it("refuses to overwrite an existing wallet through the API without force=true", async () => {
+    await createWallet({
+      network: "ethereum-sepolia",
+      seedPhrase: DEMO_SEED_PHRASE,
+    });
+
+    const response = await createWalletRoute(
+      new Request("http://localhost:3000/api/wallet", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({}),
+      }),
+    );
+
+    const payload = (await response.json()) as { error?: string };
+
+    expect(response.status).toBe(409);
+    expect(payload.error).toMatch(/already stored/i);
   });
 });

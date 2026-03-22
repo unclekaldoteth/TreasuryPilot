@@ -37,15 +37,27 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  let body: { seedPhrase?: string } = {};
+  let body: { seedPhrase?: string; force?: boolean } = {};
 
   try {
-    body = (await request.json()) as { seedPhrase?: string };
+    body = (await request.json()) as { seedPhrase?: string; force?: boolean };
   } catch {
     body = {};
   }
 
   try {
+    const existingWalletConfig = await getLatestWalletConfig();
+
+    if (existingWalletConfig && !body.force) {
+      return NextResponse.json(
+        {
+          error:
+            "A wallet is already stored for this environment. Refusing to overwrite it without force=true.",
+        },
+        { status: 409 },
+      );
+    }
+
     const wallet = await createWallet({
       network: getEnv().wdkNetwork,
       seedPhrase: body.seedPhrase,
